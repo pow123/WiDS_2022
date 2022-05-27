@@ -1,0 +1,197 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		 <style>
+    .left {
+      text-align: left;
+    }
+    
+    .size {
+      font-size: 80px;
+    }
+  </style>
+
+		<title>Data Viz 4 All</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/white.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section><h1>Data Visualization for All:</h1>
+					<p><strong>The Art and Science of Communicating with Data</strong></p>
+					<p><br /><small>Peace Ossom Williamson</small></p>
+					<p><small>Associate Director, NNLM National Center for Data Services</small></p>
+					<p><small><a href="https://twitter.com/123POW">@123POW</a> | <a href="mailto:nnlm-ncds@nyulangone.org">nnlm-ncds@nyulangone.org</a></small></p>
+					<p><small><strong>Access sildes at <a href="https://pow123.github.io/WiDS_2022">https://pow123.github.io/WiDS_2022</a></strong></small></p>
+					<aside class="notes"> Mention the NNLM, mention how to navigate the slides, contact info</aside>
+				</section>
+				<section data-background-image="https://media.khou.com/assets/KHOU/images/a37c753b-ba04-4495-8a3b-66b62c61af9a/a37c753b-ba04-4495-8a3b-66b62c61af9a_750x422.jpg"><h1>Uvalde</h1></section>
+				<section>
+					<h2>Viz Defined</h2>
+					<p>Visualization is aggregating and manipulating data for visual display.</p>
+					<aside class="notes">plotting, graphing, charting. you are making decisions and choices with the data.</aside>
+				</section>
+				<section data-background-image="/img/purplemap.png" alt="map as background decoration"><h2>Impact of Data Visualization</h2>
+				<ul>
+					<li>exploration versus explanation</li>
+					<li>visualization as art</li>
+					<li>visualization as emotion</li>
+				</ul>
+				<aside class="notes">
+					We all associate visualizations with the science, but there are more aspects to think about. What role could research into violence and firearms play in preventing future tragedies? How can these data be effective for both guiding policy (the science) and impacting individuals (the emotion, the appeal) </aside>
+				</section>
+				<section><h2>New to Data?</h2>
+				<p><img src="https://blogger.googleusercontent.com/img/a/AVvXsEhoElW4wPA5Dhb_izMnn-PGsJksFZJ4iQysdfS6Bro49DbXrtV04TdVp_FUuJPWzl3GX44OWrO6Ls7azM2uv3_j0HJ9SNACT3CxPxmIzw39Lwc0H5XZ1NzMgXMwFt5ffsoszWpIGte8ClefpuGhPdAHLrG7vtuC2eamH74zQZeL7l6QilxnyP_BEAWVBg=w640-h494" height="300" alt="FLOAT method shown in a cloud graphic: Formulating Research Question, Locating Data, Organizing and Analyzing Data, and Telling Data Story."/></p>
+				<p>Open Educational Resource / Open Textbook: <br /><a href="https://uta.pressbooks.pub/datanotebook">The Data Notebook</a></p></section>
+				<section>Considerations
+					<p>The who, what, where, why. Don't forget the which.</p>
+					<ul>
+						<li> Who is the viz for?</li>
+						<li>What is the message you are communicating?</li>
+						<li>Where will that viz be presented?</li>
+						<li>Which features are important?</li>
+						</ul>
+				<aside class="notes">Reframe viz as a data organization problem. Be accurate with what you present.</aside>
+				</section>
+				<section><h2>EDA: Data Visualization Informing Modeling</h2>
+					<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Roc_curve.svg/220px-Roc_curve.svg.png" alt="example ROC curve"/>
+					<aside class="notes">In tidy models, practitioners define steps and prepare them with testing data. Testing for data leakage is a defining feature of the design of tidy models. And steps are specifically chosen based on what was learned during EDA. For example: Receiver operator characteristic (ROC) curve - viz representing how well a binary classification model is doing.</aside>
+			</section>
+			<section><h2>Visualization Design</h2>
+				<img src="img/covid-map.png" alt="Map of COVID-19 cases. Choropleth map shows cases by purple gradient without a legend and says 'April 2020' in the corner."/>
+				<aside class="notes">What are elements used to create this viz? What are design decisions made?
+				</aside>
+			</section>
+				<section><h2>Visualization Design: Map Example</h2>
+					<img src="img/cp-head.PNG" alt="image of the tibble in R"/>
+					<p><small>Data source: <a href="https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4/data">COVID-19 Case Surveillance Public Use Data</small></a></p>
+					</section>
+				<section><h2>Example 1: COVID-19 Map</h2>
+					<pre><code data-trim>
+cp <- states %>%
+  group_by(dator, date, res_state, State) %>% 
+  summarize(cases_total= sum(cases)) %>% 
+  mutate(hover=paste(State, " (", res_state, ") \n ", cases_total, "cases"))
+fontStyle = list(
+  size = 15,
+  color = "black"
+)
+label = list(
+  bgcolor = "#EEEEEE",
+  bordercolor = "transparent",
+  font = fontStyle
+)
+casegraph <- plot_geo(cp,
+                     locationmode = "USA-states") %>% 
+  add_trace(locations= ~res_state,
+            z = ~cases_total,
+            zmin = 0,
+            zmax = 10000,
+            frame = ~dator,
+            color= ~cases_total,
+            colors = "Purples",
+            text = ~hover,
+            hoverinfo = "text") %>% 
+  layout(geo = list(scope = "usa"),
+         title = "COVID-19 Monthly Cases\n2020-present") %>% 
+  style(hoverlabel = label) %>% 
+  config(diplayModeBar = FALSE)
+  
+casegraph
+
+					</code></pre>
+					</section>
+				<section><h2>Result</h2>
+				<p>Live Map: <a href="https://rpubs.com/pow123/covmap">https://rpubs.com/pow123/covmap</a></p>
+				</section>
+				<section><h2>Example 2: Line Chart</h2>
+				<p>original version</p>
+				<img src="img/caseline-default.png" alt="line chart of cases by month in Texas and California. There is a grey background with white vertical and horizontal gridlines, a legend, and two thin lines representing the data. The numbers on the y-axis are in scientific notation."/>
+				</section>
+				<section><h2>Example 2: Line Chart</h2>
+				<p>updated version</p>
+				<img src="img/covid-txca.png" alt="line chart of cases by month in Texas and California. Texas is a thick red line, and California is blue. The lines are directly labeled. There is no background color or gridlines. The numbers on the y-axis are written in millions."/>
+				</section>
+				<section><h2>Original Line Chart Code</h2>
+				<pre><code data-trim>
+caseline <- ggplot(scp, aes(date, cases)) +
+  geom_line(aes(color = res_state)) +
+  labs(title = "COVID-19 Cases in California and Texas\n2020-present")
+caseline</code></pre>
+				</section>
+				<section><h2>Updated Line Chart Code</h2>
+				<pre><code data-trim>
+aseline <- ggplot(scp, aes(date, cases)) +
+  geom_line(aes(color = res_state),size=2) +
+  scale_color_manual(values = c("steelblue", "darkred")) +
+  geom_dl(aes(label = res_state), method = list(dl.trans(x = x - 0.5),
+                                           "top.bumpup", cex = 1.5,fontface='bold')) +
+  scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) +
+  labs(title = "COVID-19 Cases in California and Texas\n2020-present")
+caseline + theme(legend.position="none", plot.title = element_text(size=22), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.title.x = element_blank(), axis.title.y = element_blank())</code></pre>
+				</section>
+				<section><h2>Consider Design Elements</h2>
+				<img src="img/viz-features.jpg" alt="Attributes of a visualization"/>
+				</section>
+				<section><table>
+				<tr>
+				<td>Before</td>
+				<td>After</td>
+				</tr>
+				<tr>
+				<td><img src="img/pertussis-scatter1.png" alt="purple scatterplot with dots clustered at the bottom left"/></td>
+				<td><img src="img/pertussis-scatter2.png" alt="grey scatterplot with dots clustered at the bottom left. One dot at the top right is purple and enclosed in a circle."</td>
+				</tr>
+				</table>
+				</section>
+				<section><h2>Polishing requires more work.</h2>
+				<aside class="notes">It's a lot more work to make an expository graphic.</aside>
+				</section>
+				<section><h2>Accessibility</h2>
+				<ul>
+				<li>Text supports.</li>
+				<li>Use more than hue.</li>
+				<li>Reproducibility.</li>
+				</ul>
+				<aside class="notes">Tone and shade (adding dark and light)</aside>
+				</section>
+				<section><h2>Don't Forget Reproducibility</h2>
+				<img src="img/gapminder-scatter.jpg" alt="image of the gapminder dataset and its original code. longer code not shown."/>
+				<aside>Allows others to see the decisions, access the underlying data, and better understand. There are many tools and steps for reproducibility</aside></section>
+				<section>
+					<h2>Thank you!</h2>
+					<p>More info: <a href="https://uta.pressbooks.pub/datanotebook/chapter/2-6-tell/>">The Data Notebook Chapter, "Tell"</a></p>
+					<p>Materials: <a href="https://github.com/pow123/WiDS_2022/materials">https://github.com/pow123/WiDS_2022/materials</a></p>
+				
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+
+			Reveal.initialize({
+				center: true,
+				hash: true,
+				slideNumber: true,
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
